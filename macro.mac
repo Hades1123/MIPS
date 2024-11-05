@@ -1,0 +1,85 @@
+.data
+	newline: .asciiz "\n"
+		
+# newLine
+	.macro newLine
+	la $a0, newline
+	li $v0, 4
+	syscall
+	.end_macro
+
+# print_str
+	.macro print_str (%str)
+	la $a0, %str
+	li $v0, 4
+	syscall
+	.end_macro
+
+# print_int
+	.macro print_int (%int, %message)
+	print_str(%message)
+	move $a0, %int
+	li $v0, 1
+	syscall
+	.end_macro
+	
+# puti_p
+	.macro puti_p (%message, %int)
+	print_str(%message)
+	la $t0, %int
+	lw $a0, 0($t0)
+	li $v0, 1
+	syscall
+	.end_macro
+
+# putf_p
+	.macro putf_p (%message, %float)
+	print_str(%message)
+	la $t0, %float
+	lwc1 $f12, 0($t0)
+	li $v0, 2
+	syscall
+	.end_macro
+
+# input_int
+	.macro input_int(%register)
+	li $v0, 5
+	syscall
+	move %register, $v0
+	.end_macro
+	
+# input_float
+	.macro input_float(%register)
+	li $v0, 6
+	syscall
+	mov.s %register, $f0
+	.end_macro
+	
+# print_float
+	.macro print_float (%float)
+	mov.s $f12, %float
+	li $v0, 2
+	syscall
+	.end_macro
+
+# print_double
+	.macro print_double(%double)
+	mov.d $f12 %double
+	li $v0, 3
+	syscall
+	.end_macro
+
+# exit
+	.macro exit
+	li $v0, 10
+	syscall
+	.end_macro
+	
+# for_loop : i = start ; i <= end ; ++ i
+	.macro for (%regIterator, %start, %end, %body)
+	add %regIterator, $zero, %start
+	loop:
+		%body()
+		add %regIterator, %regIterator, 1
+		ble %regIterator, %end, loop
+	.end_macro
